@@ -1,0 +1,44 @@
+name: Workflow - Build all crates
+
+on:
+  push:
+
+jobs:
+  split-crates:
+    name: Prepare crate list
+    runs-on: ubuntu-latest
+    outputs:
+      crates: ${{ steps.env.outputs.crates }}
+    steps:
+      - name: Checkout Bevy
+        uses: actions/checkout@v4
+        with:
+          repository: bevyengine/bevy
+          ref: main
+      - name: Prepare crate list
+        id: env
+        run: |
+          crate_list=`cargo test -p 2>&1 | grep '  bevy'`
+          echo "crates=`python3 -c \"import json; crate_list='''$crate_list''';print(json.dumps([crate.strip() for crate in crate_list.splitlines()]))\"`" >> $GITHUB_OUTPUT
+
+  build-crates-screenshots:
+    name: Take Screenshots
+    needs: [split-crates]
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        crate: ${{ fromJSON(needs.split-crates.outputs.crates) }}
+
+    steps:
+      - name: Checkout Bevy
+        uses: actions/checkout@v4
+        with:
+          repository: bevyengine/bevy
+          ref: main
+
+      - name: Setup Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Build Crate
+        run: |
+          cargo build -p ${{ matrix.crate }}
