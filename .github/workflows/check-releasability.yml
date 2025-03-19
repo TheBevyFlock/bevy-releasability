@@ -18,6 +18,9 @@ jobs:
       - name: Prepare crate list
         id: env
         run: |
+          # remove workspace members that are not published
+          sed -z -i 's/members = \[[^]]*\]/members = ["crates\/*"]/' Cargo.toml
+
           crate_list=`cargo test -p 2>&1 | grep '   '`
           echo "crates=`python3 -c \"import json; crate_list='''$crate_list''';print(json.dumps([crate.strip() for crate in crate_list.splitlines()]))\"`" >> $GITHUB_OUTPUT
 
