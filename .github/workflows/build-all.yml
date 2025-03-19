@@ -21,11 +21,12 @@ jobs:
           crate_list=`cargo test -p 2>&1 | grep '  bevy'`
           echo "crates=`python3 -c \"import json; crate_list='''$crate_list''';print(json.dumps([crate.strip() for crate in crate_list.splitlines()]))\"`" >> $GITHUB_OUTPUT
 
-  build-crates-screenshots:
-    name: Take Screenshots
+  build-crates:
+    name: Build Crate
     needs: [split-crates]
     runs-on: ubuntu-latest
     strategy:
+      fail-fast: false
       matrix:
         crate: ${{ fromJSON(needs.split-crates.outputs.crates) }}
 
