@@ -30,22 +30,57 @@ jobs:
       matrix:
         crate: ${{ fromJSON(needs.split-crates.outputs.crates) }}
         extra: ["", "--all-features", "--no-default-features"]
-
     steps:
       - name: Checkout Bevy
         uses: actions/checkout@v4
         with:
           repository: bevyengine/bevy
           ref: main
-
       - name: Setup Rust
         uses: dtolnay/rust-toolchain@stable
-
       - name: Install Bevy dependencies
         run: |
           sudo apt-get update;
           DEBIAN_FRONTEND=noninteractive sudo apt-get install --no-install-recommends -yq libasound2-dev libudev-dev libxkbcommon-x11-0;
-
       - name: Build Crate
         run: |
           cargo build -p ${{ matrix.crate }} ${{ matrix.extra }}
+
+  release-private-registry:
+    name: Release to Private Registry
+    runs-on: ubuntu-latest
+    steps:
+      - name: Starts kellnr
+        run: |
+          docker run --detach --rm -p 8000:8000 --name kellnr -e "KELLNR_ORIGIN__HOSTNAME=kellnr" ghcr.io/kellnr/kellnr:5.0.0
+      - name: Checkout Bevy
+        uses: actions/checkout@v4
+        with:
+          repository: bevyengine/bevy
+          ref: main
+      - name: Setup Rust
+        uses: dtolnay/rust-toolchain@nightly
+      - name: Install Bevy dependencies
+        run: |
+          sudo apt-get update;
+          DEBIAN_FRONTEND=noninteractive sudo apt-get install --no-install-recommends -yq libasound2-dev libudev-dev libxkbcommon-x11-0;
+      - name: Setup kellnr registry
+        run: |
+          # add kellnr registry to cargo config
+          cat > .cargo/config.toml<< EOF
+          [registries.kellnr]
+          index = "sparse+http://localhost:8000/api/v1/crates/"
+          credential-provider = ["cargo:token"]
+          token = "Zy9HhJ02RJmg0GCrgLfaCVfU6IwDfhXD"
+          EOF
+          # remove workspace members that are not published
+          sed -z -i 's/members = \[[^]]*\]/members = ["crates\/*"]/' Cargo.toml
+          # set all local dependency as coming from the kellnr registry
+          find . -name Cargo.toml | xargs sed -i 's/{ path = "/{ registry = "kellnr", path = "/'
+      - name: Publish to kellnr registry
+        run: |
+          cargo +nightly publish --workspace --allow-dirty --registry kellnr -Z package-workspace
+      - name: Stops kellnr
+        if: always()
+        run: |
+          docker stop kellnr
