@@ -79,7 +79,7 @@ jobs:
           find . -name Cargo.toml | xargs sed -i 's/{ path = "/{ registry = "kellnr", path = "/'
       - name: Publish to kellnr registry
         run: |
-          cargo +nightly publish --workspace --allow-dirty --registry kellnr -Z package-workspace
+          cargo +nightly publish --workspace --allow-dirty --no-verify --registry kellnr -Z package-workspace
       - name: Stops kellnr
         if: always()
         run: |
