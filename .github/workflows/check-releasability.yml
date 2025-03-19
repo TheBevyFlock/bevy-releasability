@@ -1,4 +1,4 @@
-name: Workflow - Build all crates
+name: Check Releasability
 
 on:
   push:
