@@ -46,6 +46,17 @@ jobs:
         run: |
           sudo apt-get update;
           DEBIAN_FRONTEND=noninteractive sudo apt-get install --no-install-recommends -yq libasound2-dev libudev-dev libxkbcommon-x11-0 libwayland-dev
+      - uses: actions/cache/restore@v4
+        id: restore-cache
+        with:
+          path: |
+            ~/.cargo/bin/
+            ~/.cargo/registry/index/
+            ~/.cargo/registry/cache/
+            ~/.cargo/git/db/
+            target/
+          key: cargo-${{ matrix.extra }}-${{ hashFiles('**/Cargo.toml') }}
+          restore-keys: cargo-${{ matrix.extra }}
       - name: Build Crate
         run: |
           cargo build -p ${{ matrix.crate }} ${{ matrix.extra }}
