@@ -45,7 +45,7 @@ jobs:
       - name: Install Bevy dependencies
         run: |
           sudo apt-get update;
-          DEBIAN_FRONTEND=noninteractive sudo apt-get install --no-install-recommends -yq libasound2-dev libudev-dev libxkbcommon-x11-0;
+          DEBIAN_FRONTEND=noninteractive sudo apt-get install --no-install-recommends -yq libasound2-dev libudev-dev libxkbcommon-x11-0 libwayland-dev
       - name: Build Crate
         run: |
           cargo build -p ${{ matrix.crate }} ${{ matrix.extra }}
@@ -70,7 +70,7 @@ jobs:
       - name: Install Bevy dependencies
         run: |
           sudo apt-get update;
-          DEBIAN_FRONTEND=noninteractive sudo apt-get install --no-install-recommends -yq libasound2-dev libudev-dev libxkbcommon-x11-0 libwayland-dev;
+          DEBIAN_FRONTEND=noninteractive sudo apt-get install --no-install-recommends -yq libasound2-dev libudev-dev libxkbcommon-x11-0
       - name: Setup kellnr registry
         run: |
           # add kellnr registry to cargo config
