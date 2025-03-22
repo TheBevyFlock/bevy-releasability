@@ -25,8 +25,8 @@ jobs:
           crate_list=`cargo test -p 2>&1 | grep '   '`
           echo "crates=`python3 -c \"import json; crate_list_str='''$crate_list''';crate_list=[crate.strip() for crate in crate_list_str.splitlines()];crate_list.sort();print(json.dumps(crate_list))\"`" >> $GITHUB_OUTPUT
 
-  build-crates:
-    name: Build Crate
+  crate-check:
+    name: Check
     needs: [split-crates]
     runs-on: ubuntu-latest
     strategy:
