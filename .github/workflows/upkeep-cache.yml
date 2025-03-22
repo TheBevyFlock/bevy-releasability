@@ -9,9 +9,6 @@ jobs:
   build-cache:
     name: Build Cache
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        extra: ["", "--all-features", "--no-default-features"]
 
     steps:
       - name: Checkout Bevy main branch
@@ -28,7 +25,9 @@ jobs:
           DEBIAN_FRONTEND=noninteractive sudo apt-get install --no-install-recommends -yq libasound2-dev libudev-dev libxkbcommon-x11-0 libwayland-dev
 
       - name: Build an example (Linux)
-        run: cargo build ${{ matrix.extra }}
+        run: |
+          cargo build -p bevy --all-features
+          cargo clippy -p bevy --all-features
 
       - name: Save cache
         uses: actions/cache/save@v4
@@ -39,4 +38,4 @@ jobs:
             ~/.cargo/registry/cache/
             ~/.cargo/git/db/
             target/
-          key: cargo-${{ matrix.extra }}-${{ hashFiles('**/Cargo.toml') }}
+          key: cargo-${{ hashFiles('**/Cargo.toml') }}

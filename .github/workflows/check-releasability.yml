@@ -55,8 +55,8 @@ jobs:
             ~/.cargo/registry/cache/
             ~/.cargo/git/db/
             target/
-          key: cargo-${{ matrix.extra }}-${{ hashFiles('**/Cargo.toml') }}
-          restore-keys: cargo-${{ matrix.extra }}
+          key: cargo-${{ hashFiles('**/Cargo.toml') }}
+          restore-keys: cargo-
       - name: Build Crate
         run: |
           cargo build -p ${{ matrix.crate }} ${{ matrix.extra }}
