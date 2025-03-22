@@ -2,6 +2,7 @@ name: Check Releasability
 
 on:
   push:
+  workflow_dispatch:
 
 jobs:
   split-crates:
