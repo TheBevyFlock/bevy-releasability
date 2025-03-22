@@ -62,7 +62,7 @@ jobs:
           cargo build -p ${{ matrix.crate }} ${{ matrix.extra }}
       - name: Clippy Crate
         run: |
-          cargo clippy -p ${{ matrix.crate }} ${{ matrix.extra }} -- -D warnings
+          cargo clippy -p ${{ matrix.crate }} ${{ matrix.extra }} --no-deps -- -D warnings
 
   release-private-registry:
     name: Release to Private Registry
