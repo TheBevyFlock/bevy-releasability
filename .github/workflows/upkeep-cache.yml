@@ -5,6 +5,11 @@ on:
   schedule:
     - cron: "0 0 * * *"
 
+env:
+  CARGO_INCREMENTAL: 0
+  CARGO_PROFILE_TEST_DEBUG: 0
+  CARGO_PROFILE_DEV_DEBUG: 0
+
 jobs:
   build-cache:
     name: Build Cache
