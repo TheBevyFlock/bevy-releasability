@@ -109,7 +109,7 @@ jobs:
       - name: Enable android game-activity
         if: matrix.target.target == 'aarch64-linux-android'
         run: |
-          cargo add --package ${{ matrix.target.target }} android-activity --features game-activity
+          cargo add --package ${{ matrix.crate }} android-activity --features game-activity
       - name: Build Crate
         run: |
           cargo build --target ${{ matrix.target.target }} -p ${{ matrix.crate }}
