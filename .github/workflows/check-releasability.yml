@@ -88,6 +88,8 @@ jobs:
             "aarch64-apple-ios",
             "wasm32-unknown-unknown",
           ]
+        exclude:
+          - crate: bevy_dylib
     steps:
       - name: Checkout Bevy
         uses: actions/checkout@v4
