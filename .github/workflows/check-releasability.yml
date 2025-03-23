@@ -106,6 +106,10 @@ jobs:
         run: |
           sudo apt-get update;
           DEBIAN_FRONTEND=noninteractive sudo apt-get install --no-install-recommends -yq libasound2-dev libudev-dev libxkbcommon-x11-0 libwayland-dev
+      - name: Enable android game-activity
+        if: matrix.target.target == 'aarch64-linux-android'
+        run: |
+          cargo add --package ${{ matrix.target.target }} android-activity --features game-activity
       - name: Build Crate
         run: |
           cargo build --target ${{ matrix.target.target }} -p ${{ matrix.crate }}
