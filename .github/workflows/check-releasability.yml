@@ -74,6 +74,39 @@ jobs:
         run: |
           cargo clippy -p ${{ matrix.crate }} ${{ matrix.extra }} --no-deps -- -D warnings
 
+  crate-archi:
+    name: Toolchains
+    needs: [split-crates]
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        crate: ${{ fromJSON(needs.split-crates.outputs.crates) }}
+        target:
+          [
+            "aarch64-linux-android",
+            "aarch64-apple-ios",
+            "wasm32-unknown-unknown",
+          ]
+    steps:
+      - name: Checkout Bevy
+        uses: actions/checkout@v4
+        with:
+          repository: bevyengine/bevy
+          ref: main
+      - name: Setup Rust
+        uses: dtolnay/rust-toolchain@stable
+      - name: Install Bevy dependencies
+        run: |
+          sudo apt-get update;
+          DEBIAN_FRONTEND=noninteractive sudo apt-get install --no-install-recommends -yq libasound2-dev libudev-dev libxkbcommon-x11-0 libwayland-dev
+      - name: Build Crate
+        run: |
+          cargo build --target ${{ matrix.target }} -p ${{ matrix.crate }}
+      - name: Clippy Crate
+        run: |
+          cargo clippy --target ${{ matrix.target }} -p ${{ matrix.crate }} --no-deps -- -D warnings
+
   release-private-registry:
     name: Release to Private Registry
     runs-on: ubuntu-latest
