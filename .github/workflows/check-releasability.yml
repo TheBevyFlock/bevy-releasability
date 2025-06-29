@@ -41,9 +41,42 @@ jobs:
         crate: ${{ fromJSON(needs.split-crates.outputs.crates) }}
         extra: ["", "--all-features", "--no-default-features"]
         exclude:
-          # can't build as it needs either x11 or wayland feature enabled
+          # needs either bevy_image/zstd_rust or bevy_image/zstd_c
+          - crate: "bevy_anti_aliasing"
+            extra: "--all-features"
+          # needs a math backend
+          - crate: "bevy_color"
+            extra: "--no-default-features"
+          # needs either bevy_image/zstd_rust or bevy_image/zstd_c
+          - crate: "bevy_core_pipeline"
+            extra: "--all-features"
+          # needs a math backend
+          - crate: "bevy_input"
+            extra: "--no-default-features"
+          # needs a math backend
+          - crate: "bevy_transform"
+            extra: "--no-default-features"
+          # needs a math backend
+          - crate: "bevy_window"
+            extra: "--no-default-features"
+          # needs either x11 or wayland feature enabled
           - crate: "bevy_winit"
             extra: "--no-default-features"
+        include:
+          - crate: "bevy_anti_aliasing"
+            extra: "--all-features --features bevy_image/zstd_rust"
+          - crate: "bevy_color"
+            extra: "--no-default-features --features bevy_math/libm"
+          - crate: "bevy_core_pipeline"
+            extra: "--all-features --features bevy_image/zstd_rust"
+          - crate: "bevy_input"
+            extra: "--no-default-features --features bevy_math/libm"
+          - crate: "bevy_transform"
+            extra: "--no-default-features --features bevy_math/libm"
+          - crate: "bevy_window"
+            extra: "--no-default-features --features bevy_math/libm"
+          - crate: "bevy_winit"
+            extra: "--no-default-features --features winit/x11"
     steps:
       - name: Checkout Bevy
         uses: actions/checkout@v4
