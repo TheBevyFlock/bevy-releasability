@@ -54,6 +54,9 @@ jobs:
           - crate: "bevy_input"
             extra: "--no-default-features"
           # needs a math backend
+          - crate: "bevy_math"
+            extra: "--no-default-features"
+          # needs a math backend
           - crate: "bevy_transform"
             extra: "--no-default-features"
           # needs a math backend
@@ -71,6 +74,12 @@ jobs:
             extra: "--all-features --features bevy_image/zstd_rust"
           - crate: "bevy_input"
             extra: "--no-default-features --features bevy_math/libm"
+          - crate: "bevy_math"
+            extra: "--no-default-features --features libm"
+          - crate: "bevy_math"
+            extra: "--no-default-features --features std"
+          - crate: "bevy_math"
+            extra: "--no-default-features --features nostd-libm"
           - crate: "bevy_transform"
             extra: "--no-default-features --features bevy_math/libm"
           - crate: "bevy_window"
