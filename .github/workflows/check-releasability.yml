@@ -166,7 +166,7 @@ jobs:
     steps:
       - name: Starts kellnr
         run: |
-          docker run --detach --rm -p 8000:8000 --name kellnr -e "KELLNR_ORIGIN__HOSTNAME=localhost" ghcr.io/kellnr/kellnr:5.0.0
+          docker run --detach --rm -p 8000:8000 --name kellnr -e "KELLNR_ORIGIN__HOSTNAME=localhost" ghcr.io/kellnr/kellnr:5.6
       - name: Checkout Bevy
         uses: actions/checkout@v4
         with:
