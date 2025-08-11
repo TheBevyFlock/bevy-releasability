@@ -156,6 +156,8 @@ jobs:
       - name: Build Crate
         run: |
           cargo build --target ${{ matrix.target.target }} -p ${{ matrix.crate }}
+        env:
+          RUSTFLAGS: "${{ matrix.target.target == 'wasm32-unknown-unknown' && '--cfg getrandom_backend=\"wasm_js\" -D warnings' || '-D warnings' }}"
       - name: Clippy Crate
         run: |
           cargo clippy --target ${{ matrix.target.target }} -p ${{ matrix.crate }} --no-deps -- -D warnings
