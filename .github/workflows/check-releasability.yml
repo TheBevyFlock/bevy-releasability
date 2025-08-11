@@ -161,6 +161,8 @@ jobs:
       - name: Clippy Crate
         run: |
           cargo clippy --target ${{ matrix.target.target }} -p ${{ matrix.crate }} --no-deps -- -D warnings
+        env:
+          RUSTFLAGS: "${{ matrix.target.target == 'wasm32-unknown-unknown' && '--cfg getrandom_backend=\"wasm_js\" -D warnings' || '-D warnings' }}"
 
   release-private-registry:
     name: Release to Private Registry
