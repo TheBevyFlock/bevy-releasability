@@ -48,7 +48,7 @@ jobs:
       - name: Prepare feature list
         id: env
         run: |
-          feature_list=`toml get Cargo.toml features | jq 'keys'`
+          feature_list=`toml get Cargo.toml features | jq -c 'keys'`
           echo "features=$feature_list" >> $GITHUB_OUTPUT
 
   crate-check:
