@@ -31,6 +31,26 @@ jobs:
           crate_list=`cargo test -p 2>&1 | grep '   '`
           echo "crates=`python3 -c \"import json; crate_list_str='''$crate_list''';crate_list=[crate.strip() for crate in crate_list_str.splitlines()];crate_list.sort();print(json.dumps(crate_list))\"`" >> $GITHUB_OUTPUT
 
+  list-features:
+    name: Prepare feature list
+    runs-on: ubuntu-latest
+    outputs:
+      features: ${{ steps.env.outputs.features }}
+    steps:
+      - name: Checkout Bevy
+        uses: actions/checkout@v4
+        with:
+          repository: bevyengine/bevy
+          ref: main
+      - name: Install toml-cli
+        run: |
+          cargo install toml-cli@0.2.3
+      - name: Prepare feature list
+        id: env
+        run: |
+          feature_list=`toml get Cargo.toml features | jq 'keys'`
+          echo "features=$feature_list" >> $GITHUB_OUTPUT
+
   crate-check:
     name: Check
     needs: [split-crates]
@@ -163,6 +183,30 @@ jobs:
           cargo clippy --target ${{ matrix.target.target }} -p ${{ matrix.crate }} --no-deps -- -D warnings
         env:
           RUSTFLAGS: "${{ matrix.target.target == 'wasm32-unknown-unknown' && '--cfg getrandom_backend=\"wasm_js\" -D warnings' || '-D warnings' }}"
+
+  feature-check:
+    name: Feature
+    needs: [list-features]
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        feature: ${{ fromJSON(needs.list-features.outputs.features) }}
+    steps:
+      - name: Checkout Bevy
+        uses: actions/checkout@v4
+        with:
+          repository: bevyengine/bevy
+          ref: main
+      - name: Setup Rust
+        uses: dtolnay/rust-toolchain@stable
+      - name: Install Bevy dependencies
+        run: |
+          sudo apt-get update;
+          DEBIAN_FRONTEND=noninteractive sudo apt-get install --no-install-recommends -yq libasound2-dev libudev-dev libxkbcommon-x11-0 libwayland-dev
+      - name: Build Crate
+        run: |
+          cargo build --no-default-features --features ${{ matrix.feature }}
 
   release-private-registry:
     name: Release to Private Registry
