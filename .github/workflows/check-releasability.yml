@@ -114,6 +114,8 @@ jobs:
           ref: main
       - name: Setup Rust
         uses: dtolnay/rust-toolchain@beta
+        with:
+          components: clippy
       - name: Install Bevy dependencies
         run: |
           sudo apt-get update;
@@ -163,6 +165,7 @@ jobs:
       - name: Setup Rust
         uses: dtolnay/rust-toolchain@beta
         with:
+          components: clippy
           targets: ${{ matrix.target.target }}
       - name: Install Bevy dependencies
         if: runner.os == 'Linux'
