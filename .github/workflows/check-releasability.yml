@@ -70,6 +70,9 @@ jobs:
           # needs either bevy_image/zstd_rust or bevy_image/zstd_c
           - crate: "bevy_core_pipeline"
             extra: "--all-features"
+          # needs either bevy_relfect/auto_register_inventory or bevy_relfect/auto_register_static
+          - crate: "bevy_app"
+            extra: "--all-features"
           # needs a math backend
           - crate: "bevy_input"
             extra: "--no-default-features"
@@ -92,6 +95,8 @@ jobs:
             extra: "--no-default-features --features bevy_math/libm"
           - crate: "bevy_core_pipeline"
             extra: "--all-features --features bevy_image/zstd_rust"
+          - crate: "bevy_app"
+            extra: "--all-features --features brevy_reflect/auto_register_static"
           - crate: "bevy_input"
             extra: "--no-default-features --features bevy_math/libm"
           - crate: "bevy_math"
@@ -195,6 +200,32 @@ jobs:
       fail-fast: false
       matrix:
         feature: ${{ fromJSON(needs.list-features.outputs.features) }}
+        exclude:
+          # needs the native dlss dependency
+          - feature: "dlss"
+          # needs a zstd feature
+          - feature: "smaa_luts"
+          # needs a zstd feature
+          - feature: "tonemapping_luts"
+          # needs a zstd feature
+          - feature: "bevy_pbr"
+          # must target android
+          - feature: "android-game-activity"
+          # must target android
+          - feature: "android-native-activity"
+          # needs to know linux windowing backend
+          - feature: "bevy_winit"
+          # needs to know linux windowing backend
+          - feature: "accesskit_unix"
+          # needs to know linux windowing backend
+          - feature: "custom_cursor"
+        include:
+          - feature: "smaa_luts,zstd_rust"
+          - feature: "tonemapping_luts,zstd_rust"
+          - feature: "bevy_pbr,zstd_rust"
+          - feature: "bevy_winit,x11"
+          - feature: "accesskit_unix,x11"
+          - feature: "custom_cursor,x11"
     steps:
       - name: Checkout Bevy
         uses: actions/checkout@v4
