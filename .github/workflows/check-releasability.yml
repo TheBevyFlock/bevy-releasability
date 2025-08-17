@@ -113,7 +113,7 @@ jobs:
           repository: bevyengine/bevy
           ref: main
       - name: Setup Rust
-        uses: dtolnay/rust-toolchain@stable
+        uses: dtolnay/rust-toolchain@beta
       - name: Install Bevy dependencies
         run: |
           sudo apt-get update;
@@ -161,7 +161,7 @@ jobs:
           repository: bevyengine/bevy
           ref: main
       - name: Setup Rust
-        uses: dtolnay/rust-toolchain@stable
+        uses: dtolnay/rust-toolchain@beta
         with:
           targets: ${{ matrix.target.target }}
       - name: Install Bevy dependencies
@@ -199,7 +199,7 @@ jobs:
           repository: bevyengine/bevy
           ref: main
       - name: Setup Rust
-        uses: dtolnay/rust-toolchain@stable
+        uses: dtolnay/rust-toolchain@beta
       - name: Install Bevy dependencies
         run: |
           sudo apt-get update;
