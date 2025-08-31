@@ -172,7 +172,6 @@ jobs:
         exclude:
           - crate: bevy_dylib
           - crate: bevy_remote
-            target: "wasm32-unknown-unknown"
     steps:
       - name: Checkout Bevy
         uses: actions/checkout@v4
