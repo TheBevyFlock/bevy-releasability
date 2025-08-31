@@ -219,6 +219,8 @@ jobs:
           - feature: "smaa_luts"
           # needs a zstd feature
           - feature: "tonemapping_luts"
+          # needs a zstd feature
+          - feature: "bluenoise_texture"
           # must target android
           - feature: "android-game-activity"
           # must target android
@@ -232,6 +234,7 @@ jobs:
         include:
           - feature: "smaa_luts,zstd_rust"
           - feature: "tonemapping_luts,zstd_rust"
+          - feature: "bluenoise_texture,zstd_rust"
           - feature: "bevy_winit,x11"
           - feature: "accesskit_unix,x11"
           - feature: "custom_cursor,x11"
