@@ -51,6 +51,20 @@ jobs:
           feature_list=`toml get Cargo.toml features | jq -c 'keys'`
           echo "features=$feature_list" >> $GITHUB_OUTPUT
 
+  owner-check:
+    name: Check
+    needs: [split-crates]
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        crate: ${{ fromJSON(needs.split-crates.outputs.crates) }}
+        owner: ["Carter Anderson", "github:bevyengine:publish"]
+    steps:
+      - name: check owner
+        run: |
+          cargo owner --list ${{ matrix.crate }} | grep ${{ matrix.owner }}
+
   crate-check:
     name: Check
     needs: [split-crates]
