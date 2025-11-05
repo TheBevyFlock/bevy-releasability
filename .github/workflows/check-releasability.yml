@@ -52,10 +52,11 @@ jobs:
           echo "features=$feature_list" >> $GITHUB_OUTPUT
 
   owner-check:
-    name: Check
+    name: Owner Check
     needs: [split-crates]
     runs-on: ubuntu-latest
     strategy:
+      max-parallel: 1
       fail-fast: false
       matrix:
         crate: ${{ fromJSON(needs.split-crates.outputs.crates) }}
@@ -63,10 +64,11 @@ jobs:
     steps:
       - name: check owner
         run: |
-          curl https://crates.io/api/v1/crates/${{ matrix.crate }}/owners | grep '${{ matrix.owner }}'
+          curl --user-agent "francois@bevy.org" https://crates.io/api/v1/crates/${{ matrix.crate }}/owners | grep '${{ matrix.owner }}'
+          sleep 2
 
   crate-check:
-    name: Check
+    name: Crate Check
     needs: [split-crates]
     runs-on: ubuntu-latest
     strategy:
