@@ -63,7 +63,7 @@ jobs:
     steps:
       - name: check owner
         run: |
-          curl https://crates.io/api/v1/crates/${{ matrix.crate }}/owners | grep ${{ matrix.owner }}
+          curl https://crates.io/api/v1/crates/${{ matrix.crate }}/owners | grep '${{ matrix.owner }}'
 
   crate-check:
     name: Check
