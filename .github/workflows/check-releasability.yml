@@ -326,7 +326,7 @@ jobs:
           DEBIAN_FRONTEND=noninteractive sudo apt-get install --no-install-recommends -yq libasound2-dev libudev-dev libxkbcommon-x11-0 libwayland-dev
       - name: Document with scrapping example
         run: |
-          cargo doc -Zunstable-options -Zrustdoc-scrape-examples --no-deps
+          cargo +nightly doc -Zunstable-options -Zrustdoc-scrape-examples --no-deps
 
   example-doc-check2:
     name: Example Documentation
@@ -359,7 +359,7 @@ jobs:
           DEBIAN_FRONTEND=noninteractive sudo apt-get install --no-install-recommends -yq libasound2-dev libudev-dev libxkbcommon-x11-0 libwayland-dev
       - name: Document with scrapping example
         run: |
-          cargo doc -Zunstable-options -Zrustdoc-scrape-examples --no-deps
+          cargo +nightly doc -Zunstable-options -Zrustdoc-scrape-examples --no-deps
 
   # release-private-registry:
   #   name: Release to Private Registry
