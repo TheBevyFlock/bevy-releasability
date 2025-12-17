@@ -50,6 +50,7 @@ jobs:
         run: |
           feature_list=`toml get Cargo.toml features | jq -c 'keys'`
           echo "features=$feature_list" >> $GITHUB_OUTPUT
+          echo $feature_list
 
   list-examples:
     name: Prepare example list
@@ -68,8 +69,9 @@ jobs:
       - name: Prepare example list
         id: env
         run: |
-          examples=`toml get Cargo.toml example | jq -c '[.[] | .name]'`
-          echo "examples=$examples" >> $GITHUB_OUTPUT
+          example_list=`toml get Cargo.toml example | jq -c '[.[] | .name]'`
+          echo "examples=$example_list" >> $GITHUB_OUTPUT
+          echo $example_list
 
   owner-check:
     name: Owner Check
