@@ -104,7 +104,7 @@ jobs:
         extra: ["", "--all-features", "--no-default-features"]
         exclude:
           # needs either bevy_image/zstd_rust or bevy_image/zstd_c
-          - crate: "bevy_anti_aliasing"
+          - crate: "bevy_anti_alias"
             extra: "--all-features"
           # needs a math backend
           - crate: "bevy_color"
@@ -137,7 +137,7 @@ jobs:
           - crate: "bevy_winit"
             extra: "--no-default-features"
         include:
-          - crate: "bevy_anti_aliasing"
+          - crate: "bevy_anti_alias"
             extra: "--all-features --features bevy_image/zstd_rust"
           - crate: "bevy_color"
             extra: "--no-default-features --features bevy_math/libm"
