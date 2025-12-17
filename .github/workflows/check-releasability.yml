@@ -315,10 +315,9 @@ jobs:
           path: releasability
       - name: Limit to one scrapped example
         run: |
-          ls
-          ls releasability
           pip install tomli-w
           python releasability/limit-scrapped-examples.py ${{ matrix.example }}
+          cat Cargo.toml | grep 'doc-scrape-examples = true' -B 3
       - name: Setup Rust
         uses: dtolnay/rust-toolchain@nightly
       - name: Install Bevy dependencies
@@ -349,10 +348,9 @@ jobs:
           path: releasability
       - name: Limit to one scrapped example
         run: |
-          ls
-          ls releasability
           pip install tomli-w
           python releasability/limit-scrapped-examples.py ${{ matrix.example }}
+          cat Cargo.toml | grep 'doc-scrape-examples = true' -B 3
       - name: Setup Rust
         uses: dtolnay/rust-toolchain@nightly
       - name: Install Bevy dependencies
