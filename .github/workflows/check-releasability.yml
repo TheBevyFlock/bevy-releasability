@@ -374,7 +374,7 @@ jobs:
           repository: bevyengine/bevy
           ref: main
       - name: Setup Rust
-        uses: dtolnay/rust-toolchain@nightly
+        uses: dtolnay/rust-toolchain@stable
       - name: Install Bevy dependencies
         run: |
           sudo apt-get update;
@@ -394,7 +394,7 @@ jobs:
           find . -name Cargo.toml | xargs sed -i 's/{ path = "/{ registry = "kellnr", path = "/'
       - name: Publish to kellnr registry
         run: |
-          cargo +nightly publish --workspace --allow-dirty --no-verify --registry kellnr -Z package-workspace
+          cargo publish --workspace --allow-dirty --no-verify --registry kellnr
       - name: Stops kellnr
         if: always()
         run: |
