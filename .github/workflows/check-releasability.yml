@@ -319,9 +319,7 @@ jobs:
           python releasability/limit-scrapped-examples.py ${{ matrix.example }}
           cat Cargo.toml | grep 'doc-scrape-examples = true' -B 3
       - name: Setup Rust
-        uses: dtolnay/rust-toolchain@master
-        with:
-          toolchain: nightly-2025-12-13
+        uses: dtolnay/rust-toolchain@nightly-2025-12-13
       - name: Install Bevy dependencies
         run: |
           sudo apt-get update;
@@ -354,9 +352,7 @@ jobs:
           python releasability/limit-scrapped-examples.py ${{ matrix.example }}
           cat Cargo.toml | grep 'doc-scrape-examples = true' -B 3
       - name: Setup Rust
-        uses: dtolnay/rust-toolchain@master
-        with:
-          toolchain: nightly-2025-12-13
+        uses: dtolnay/rust-toolchain@nightly-2025-12-13
       - name: Install Bevy dependencies
         run: |
           sudo apt-get update;
