@@ -307,7 +307,7 @@ jobs:
       - name: Checkout Releasability
         uses: actions/checkout@v4
         with:
-          directory: releasability
+          path: releasability
       - name: Checkout Bevy
         uses: actions/checkout@v4
         with:
@@ -339,7 +339,7 @@ jobs:
       - name: Checkout Releasability
         uses: actions/checkout@v4
         with:
-          directory: releasability
+          path: releasability
       - name: Checkout Bevy
         uses: actions/checkout@v4
         with:
