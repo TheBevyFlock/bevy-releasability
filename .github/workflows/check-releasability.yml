@@ -261,6 +261,8 @@ jobs:
           - feature: "accesskit_unix"
           # needs to know linux windowing backend
           - feature: "custom_cursor"
+          # needs to know linux windowing backend
+          - feature: "default_app"
         include:
           - feature: "smaa_luts,zstd_rust"
           - feature: "tonemapping_luts,zstd_rust"
@@ -268,6 +270,7 @@ jobs:
           - feature: "bevy_winit,x11"
           - feature: "accesskit_unix,x11"
           - feature: "custom_cursor,x11"
+          - feature: "default_app,x11"
     steps:
       - name: Checkout Bevy
         uses: actions/checkout@v4
