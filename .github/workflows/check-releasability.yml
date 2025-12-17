@@ -68,7 +68,7 @@ jobs:
       - name: Prepare example list
         id: env
         run: |
-          examples=`toml get Cargo.toml features | jq -c '[.[] | .name]'`
+          examples=`toml get Cargo.toml example | jq -c '[.[] | .name]'`
           echo "examples=$examples" >> $GITHUB_OUTPUT
 
   owner-check:
