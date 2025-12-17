@@ -51,6 +51,26 @@ jobs:
           feature_list=`toml get Cargo.toml features | jq -c 'keys'`
           echo "features=$feature_list" >> $GITHUB_OUTPUT
 
+  list-examples:
+    name: Prepare example list
+    runs-on: ubuntu-latest
+    outputs:
+      examples: ${{ steps.env.outputs.examples }}
+    steps:
+      - name: Checkout Bevy
+        uses: actions/checkout@v4
+        with:
+          repository: bevyengine/bevy
+          ref: main
+      - name: Install toml-cli
+        run: |
+          cargo install toml-cli@0.2.3
+      - name: Prepare example list
+        id: env
+        run: |
+          examples=`toml get Cargo.toml features | jq -c '[.[] | .name]'`
+          echo "examples=$examples" >> $GITHUB_OUTPUT
+
   owner-check:
     name: Owner Check
     needs: [split-crates]
@@ -268,6 +288,38 @@ jobs:
       - name: Build Crate
         run: |
           cargo build --no-default-features --features ${{ matrix.feature }}
+
+  example-doc-check:
+    name: Example Documentation
+    needs: [list-examples]
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        example: ${{ fromJSON(needs.list-examples.outputs.examples) }}
+    steps:
+      - name: Checkout Releasability
+        uses: actions/checkout@v4
+        with:
+          directory: releasability
+      - name: Checkout Bevy
+        uses: actions/checkout@v4
+        with:
+          repository: bevyengine/bevy
+          ref: main
+      - name: Setup Rust
+        uses: dtolnay/rust-toolchain@nightly
+      - name: Install Bevy dependencies
+        run: |
+          sudo apt-get update;
+          DEBIAN_FRONTEND=noninteractive sudo apt-get install --no-install-recommends -yq libasound2-dev libudev-dev libxkbcommon-x11-0 libwayland-dev
+      - name: Limit to one scrapped example
+        run: |
+          pip install tomli-w
+          python releasability/limit-scrapped-examples.py ${{ matrix.example }}
+      - name: Document with scrapping example
+        run: |
+          cargo +nightly doc -Zunstable-options -Zrustdoc-scrape-examples --no-deps
 
   release-private-registry:
     name: Release to Private Registry
