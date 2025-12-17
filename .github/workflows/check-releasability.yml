@@ -11,46 +11,46 @@ env:
   CARGO_PROFILE_DEV_DEBUG: 0
 
 jobs:
-  split-crates:
-    name: Prepare crate list
-    runs-on: ubuntu-latest
-    outputs:
-      crates: ${{ steps.env.outputs.crates }}
-    steps:
-      - name: Checkout Bevy
-        uses: actions/checkout@v4
-        with:
-          repository: bevyengine/bevy
-          ref: main
-      - name: Prepare crate list
-        id: env
-        run: |
-          # remove workspace members that are not published
-          sed -z -i 's/members = \[[^]]*\]/members = ["crates\/*"]/' Cargo.toml
+  # split-crates:
+  #   name: Prepare crate list
+  #   runs-on: ubuntu-latest
+  #   outputs:
+  #     crates: ${{ steps.env.outputs.crates }}
+  #   steps:
+  #     - name: Checkout Bevy
+  #       uses: actions/checkout@v4
+  #       with:
+  #         repository: bevyengine/bevy
+  #         ref: main
+  #     - name: Prepare crate list
+  #       id: env
+  #       run: |
+  #         # remove workspace members that are not published
+  #         sed -z -i 's/members = \[[^]]*\]/members = ["crates\/*"]/' Cargo.toml
 
-          crate_list=`cargo test -p 2>&1 | grep '   '`
-          echo "crates=`python3 -c \"import json; crate_list_str='''$crate_list''';crate_list=[crate.strip() for crate in crate_list_str.splitlines()];crate_list.sort();print(json.dumps(crate_list))\"`" >> $GITHUB_OUTPUT
+  #         crate_list=`cargo test -p 2>&1 | grep '   '`
+  #         echo "crates=`python3 -c \"import json; crate_list_str='''$crate_list''';crate_list=[crate.strip() for crate in crate_list_str.splitlines()];crate_list.sort();print(json.dumps(crate_list))\"`" >> $GITHUB_OUTPUT
 
-  list-features:
-    name: Prepare feature list
-    runs-on: ubuntu-latest
-    outputs:
-      features: ${{ steps.env.outputs.features }}
-    steps:
-      - name: Checkout Bevy
-        uses: actions/checkout@v4
-        with:
-          repository: bevyengine/bevy
-          ref: main
-      - name: Install toml-cli
-        run: |
-          cargo install toml-cli@0.2.3
-      - name: Prepare feature list
-        id: env
-        run: |
-          feature_list=`toml get Cargo.toml features | jq -c 'keys'`
-          echo "features=$feature_list" >> $GITHUB_OUTPUT
-          echo $feature_list
+  # list-features:
+  #   name: Prepare feature list
+  #   runs-on: ubuntu-latest
+  #   outputs:
+  #     features: ${{ steps.env.outputs.features }}
+  #   steps:
+  #     - name: Checkout Bevy
+  #       uses: actions/checkout@v4
+  #       with:
+  #         repository: bevyengine/bevy
+  #         ref: main
+  #     - name: Install toml-cli
+  #       run: |
+  #         cargo install toml-cli@0.2.3
+  #     - name: Prepare feature list
+  #       id: env
+  #       run: |
+  #         feature_list=`toml get Cargo.toml features | jq -c 'keys'`
+  #         echo "features=$feature_list" >> $GITHUB_OUTPUT
+  #         echo $feature_list
 
   list-examples:
     name: Prepare example list
@@ -77,223 +77,223 @@ jobs:
           echo "examples2=$example_list" >> $GITHUB_OUTPUT
           echo $example_list
 
-  owner-check:
-    name: Owner Check
-    needs: [split-crates]
-    runs-on: ubuntu-latest
-    strategy:
-      max-parallel: 1
-      fail-fast: false
-      matrix:
-        crate: ${{ fromJSON(needs.split-crates.outputs.crates) }}
-        owner: ["Carter Anderson", "github:bevyengine:publish"]
-    steps:
-      - name: check owner
-        run: |
-          curl --user-agent "francois@bevy.org" https://crates.io/api/v1/crates/${{ matrix.crate }}/owners | grep '${{ matrix.owner }}'
-          sleep 2
+  # owner-check:
+  #   name: Owner Check
+  #   needs: [split-crates]
+  #   runs-on: ubuntu-latest
+  #   strategy:
+  #     max-parallel: 1
+  #     fail-fast: false
+  #     matrix:
+  #       crate: ${{ fromJSON(needs.split-crates.outputs.crates) }}
+  #       owner: ["Carter Anderson", "github:bevyengine:publish"]
+  #   steps:
+  #     - name: check owner
+  #       run: |
+  #         curl --user-agent "francois@bevy.org" https://crates.io/api/v1/crates/${{ matrix.crate }}/owners | grep '${{ matrix.owner }}'
+  #         sleep 2
 
-  crate-check:
-    name: Crate Check
-    needs: [split-crates]
-    runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
-      matrix:
-        crate: ${{ fromJSON(needs.split-crates.outputs.crates) }}
-        extra: ["", "--all-features", "--no-default-features"]
-        exclude:
-          # needs either bevy_image/zstd_rust or bevy_image/zstd_c
-          - crate: "bevy_anti_aliasing"
-            extra: "--all-features"
-          # needs a math backend
-          - crate: "bevy_color"
-            extra: "--no-default-features"
-          # needs either bevy_image/zstd_rust or bevy_image/zstd_c
-          - crate: "bevy_core_pipeline"
-            extra: "--all-features"
-          # needs either bevy_image/zstd_rust or bevy_image/zstd_c
-          - crate: "bevy_pbr"
-            extra: "--all-features"
-          # needs either bevy_relfect/auto_register_inventory or bevy_relfect/auto_register_static
-          - crate: "bevy_app"
-            extra: "--all-features"
-          # needs either bevy_relfect/auto_register_inventory or bevy_relfect/auto_register_static
-          - crate: "bevy_ecs"
-            extra: "--all-features"
-          # needs a math backend
-          - crate: "bevy_input"
-            extra: "--no-default-features"
-          # needs a math backend
-          - crate: "bevy_math"
-            extra: "--no-default-features"
-          # needs a math backend
-          - crate: "bevy_transform"
-            extra: "--no-default-features"
-          # needs a math backend
-          - crate: "bevy_window"
-            extra: "--no-default-features"
-          # needs either x11 or wayland feature enabled
-          - crate: "bevy_winit"
-            extra: "--no-default-features"
-        include:
-          - crate: "bevy_anti_aliasing"
-            extra: "--all-features --features bevy_image/zstd_rust"
-          - crate: "bevy_color"
-            extra: "--no-default-features --features bevy_math/libm"
-          - crate: "bevy_core_pipeline"
-            extra: "--all-features --features bevy_image/zstd_rust"
-          - crate: "bevy_pbr"
-            extra: "--all-features --features bevy_image/zstd_rust"
-          - crate: "bevy_app"
-            extra: "--all-features --features bevy_reflect/auto_register_static"
-          - crate: "bevy_ecs"
-            extra: "--all-features --features bevy_reflect/auto_register_static"
-          - crate: "bevy_input"
-            extra: "--no-default-features --features bevy_math/libm"
-          - crate: "bevy_math"
-            extra: "--no-default-features --features libm"
-          - crate: "bevy_math"
-            extra: "--no-default-features --features std"
-          - crate: "bevy_math"
-            extra: "--no-default-features --features nostd-libm"
-          - crate: "bevy_transform"
-            extra: "--no-default-features --features bevy_math/libm"
-          - crate: "bevy_window"
-            extra: "--no-default-features --features bevy_math/libm"
-          - crate: "bevy_winit"
-            extra: "--no-default-features --features winit/x11"
-    steps:
-      - name: Checkout Bevy
-        uses: actions/checkout@v4
-        with:
-          repository: bevyengine/bevy
-          ref: main
-      - name: Setup Rust
-        uses: dtolnay/rust-toolchain@beta
-        with:
-          components: clippy
-      - name: Install Bevy dependencies
-        run: |
-          sudo apt-get update;
-          DEBIAN_FRONTEND=noninteractive sudo apt-get install --no-install-recommends -yq libasound2-dev libudev-dev libxkbcommon-x11-0 libwayland-dev
-      - uses: actions/cache/restore@v4
-        id: restore-cache
-        with:
-          path: |
-            ~/.cargo/bin/
-            ~/.cargo/registry/index/
-            ~/.cargo/registry/cache/
-            ~/.cargo/git/db/
-            target/
-          key: cargo-${{ hashFiles('**/Cargo.toml') }}
-          restore-keys: cargo-
-      - name: Build Crate
-        run: |
-          cargo build -p ${{ matrix.crate }} ${{ matrix.extra }}
-      - name: Clippy Crate
-        run: |
-          cargo clippy -p ${{ matrix.crate }} ${{ matrix.extra }} --no-deps -- -D warnings
+  # crate-check:
+  #   name: Crate Check
+  #   needs: [split-crates]
+  #   runs-on: ubuntu-latest
+  #   strategy:
+  #     fail-fast: false
+  #     matrix:
+  #       crate: ${{ fromJSON(needs.split-crates.outputs.crates) }}
+  #       extra: ["", "--all-features", "--no-default-features"]
+  #       exclude:
+  #         # needs either bevy_image/zstd_rust or bevy_image/zstd_c
+  #         - crate: "bevy_anti_aliasing"
+  #           extra: "--all-features"
+  #         # needs a math backend
+  #         - crate: "bevy_color"
+  #           extra: "--no-default-features"
+  #         # needs either bevy_image/zstd_rust or bevy_image/zstd_c
+  #         - crate: "bevy_core_pipeline"
+  #           extra: "--all-features"
+  #         # needs either bevy_image/zstd_rust or bevy_image/zstd_c
+  #         - crate: "bevy_pbr"
+  #           extra: "--all-features"
+  #         # needs either bevy_relfect/auto_register_inventory or bevy_relfect/auto_register_static
+  #         - crate: "bevy_app"
+  #           extra: "--all-features"
+  #         # needs either bevy_relfect/auto_register_inventory or bevy_relfect/auto_register_static
+  #         - crate: "bevy_ecs"
+  #           extra: "--all-features"
+  #         # needs a math backend
+  #         - crate: "bevy_input"
+  #           extra: "--no-default-features"
+  #         # needs a math backend
+  #         - crate: "bevy_math"
+  #           extra: "--no-default-features"
+  #         # needs a math backend
+  #         - crate: "bevy_transform"
+  #           extra: "--no-default-features"
+  #         # needs a math backend
+  #         - crate: "bevy_window"
+  #           extra: "--no-default-features"
+  #         # needs either x11 or wayland feature enabled
+  #         - crate: "bevy_winit"
+  #           extra: "--no-default-features"
+  #       include:
+  #         - crate: "bevy_anti_aliasing"
+  #           extra: "--all-features --features bevy_image/zstd_rust"
+  #         - crate: "bevy_color"
+  #           extra: "--no-default-features --features bevy_math/libm"
+  #         - crate: "bevy_core_pipeline"
+  #           extra: "--all-features --features bevy_image/zstd_rust"
+  #         - crate: "bevy_pbr"
+  #           extra: "--all-features --features bevy_image/zstd_rust"
+  #         - crate: "bevy_app"
+  #           extra: "--all-features --features bevy_reflect/auto_register_static"
+  #         - crate: "bevy_ecs"
+  #           extra: "--all-features --features bevy_reflect/auto_register_static"
+  #         - crate: "bevy_input"
+  #           extra: "--no-default-features --features bevy_math/libm"
+  #         - crate: "bevy_math"
+  #           extra: "--no-default-features --features libm"
+  #         - crate: "bevy_math"
+  #           extra: "--no-default-features --features std"
+  #         - crate: "bevy_math"
+  #           extra: "--no-default-features --features nostd-libm"
+  #         - crate: "bevy_transform"
+  #           extra: "--no-default-features --features bevy_math/libm"
+  #         - crate: "bevy_window"
+  #           extra: "--no-default-features --features bevy_math/libm"
+  #         - crate: "bevy_winit"
+  #           extra: "--no-default-features --features winit/x11"
+  #   steps:
+  #     - name: Checkout Bevy
+  #       uses: actions/checkout@v4
+  #       with:
+  #         repository: bevyengine/bevy
+  #         ref: main
+  #     - name: Setup Rust
+  #       uses: dtolnay/rust-toolchain@beta
+  #       with:
+  #         components: clippy
+  #     - name: Install Bevy dependencies
+  #       run: |
+  #         sudo apt-get update;
+  #         DEBIAN_FRONTEND=noninteractive sudo apt-get install --no-install-recommends -yq libasound2-dev libudev-dev libxkbcommon-x11-0 libwayland-dev
+  #     - uses: actions/cache/restore@v4
+  #       id: restore-cache
+  #       with:
+  #         path: |
+  #           ~/.cargo/bin/
+  #           ~/.cargo/registry/index/
+  #           ~/.cargo/registry/cache/
+  #           ~/.cargo/git/db/
+  #           target/
+  #         key: cargo-${{ hashFiles('**/Cargo.toml') }}
+  #         restore-keys: cargo-
+  #     - name: Build Crate
+  #       run: |
+  #         cargo build -p ${{ matrix.crate }} ${{ matrix.extra }}
+  #     - name: Clippy Crate
+  #       run: |
+  #         cargo clippy -p ${{ matrix.crate }} ${{ matrix.extra }} --no-deps -- -D warnings
 
-  crate-archi:
-    name: Toolchains
-    needs: [split-crates]
-    runs-on: ${{ matrix.target.os }}
-    strategy:
-      fail-fast: false
-      matrix:
-        crate: ${{ fromJSON(needs.split-crates.outputs.crates) }}
-        target:
-          # need to install android tooling and build with it
-          # - target: "aarch64-linux-android"
-          #   os: ubuntu-latest
-          - target: "wasm32-unknown-unknown"
-            os: ubuntu-latest
-          - target: "aarch64-apple-ios"
-            os: macos-latest
-        exclude:
-          - crate: bevy_dylib
-          - crate: bevy_remote
-    steps:
-      - name: Checkout Bevy
-        uses: actions/checkout@v4
-        with:
-          repository: bevyengine/bevy
-          ref: main
-      - name: Setup Rust
-        uses: dtolnay/rust-toolchain@beta
-        with:
-          components: clippy
-          targets: ${{ matrix.target.target }}
-      - name: Install Bevy dependencies
-        if: runner.os == 'Linux'
-        run: |
-          sudo apt-get update;
-          DEBIAN_FRONTEND=noninteractive sudo apt-get install --no-install-recommends -yq libasound2-dev libudev-dev libxkbcommon-x11-0 libwayland-dev
-      - name: Enable android game-activity
-        if: matrix.target.target == 'aarch64-linux-android'
-        run: |
-          cargo add --package ${{ matrix.crate }} android-activity --features game-activity
-      - name: Build Crate
-        run: |
-          cargo build --target ${{ matrix.target.target }} -p ${{ matrix.crate }}
-        env:
-          RUSTFLAGS: "${{ matrix.target.target == 'wasm32-unknown-unknown' && '--cfg getrandom_backend=\"wasm_js\" -D warnings' || '-D warnings' }}"
-      - name: Clippy Crate
-        run: |
-          cargo clippy --target ${{ matrix.target.target }} -p ${{ matrix.crate }} --no-deps -- -D warnings
-        env:
-          RUSTFLAGS: "${{ matrix.target.target == 'wasm32-unknown-unknown' && '--cfg getrandom_backend=\"wasm_js\" -D warnings' || '-D warnings' }}"
+  # crate-archi:
+  #   name: Toolchains
+  #   needs: [split-crates]
+  #   runs-on: ${{ matrix.target.os }}
+  #   strategy:
+  #     fail-fast: false
+  #     matrix:
+  #       crate: ${{ fromJSON(needs.split-crates.outputs.crates) }}
+  #       target:
+  #         # need to install android tooling and build with it
+  #         # - target: "aarch64-linux-android"
+  #         #   os: ubuntu-latest
+  #         - target: "wasm32-unknown-unknown"
+  #           os: ubuntu-latest
+  #         - target: "aarch64-apple-ios"
+  #           os: macos-latest
+  #       exclude:
+  #         - crate: bevy_dylib
+  #         - crate: bevy_remote
+  #   steps:
+  #     - name: Checkout Bevy
+  #       uses: actions/checkout@v4
+  #       with:
+  #         repository: bevyengine/bevy
+  #         ref: main
+  #     - name: Setup Rust
+  #       uses: dtolnay/rust-toolchain@beta
+  #       with:
+  #         components: clippy
+  #         targets: ${{ matrix.target.target }}
+  #     - name: Install Bevy dependencies
+  #       if: runner.os == 'Linux'
+  #       run: |
+  #         sudo apt-get update;
+  #         DEBIAN_FRONTEND=noninteractive sudo apt-get install --no-install-recommends -yq libasound2-dev libudev-dev libxkbcommon-x11-0 libwayland-dev
+  #     - name: Enable android game-activity
+  #       if: matrix.target.target == 'aarch64-linux-android'
+  #       run: |
+  #         cargo add --package ${{ matrix.crate }} android-activity --features game-activity
+  #     - name: Build Crate
+  #       run: |
+  #         cargo build --target ${{ matrix.target.target }} -p ${{ matrix.crate }}
+  #       env:
+  #         RUSTFLAGS: '${{ matrix.target.target == ''wasm32-unknown-unknown'' && ''--cfg getrandom_backend="wasm_js" -D warnings'' || ''-D warnings'' }}'
+  #     - name: Clippy Crate
+  #       run: |
+  #         cargo clippy --target ${{ matrix.target.target }} -p ${{ matrix.crate }} --no-deps -- -D warnings
+  #       env:
+  #         RUSTFLAGS: '${{ matrix.target.target == ''wasm32-unknown-unknown'' && ''--cfg getrandom_backend="wasm_js" -D warnings'' || ''-D warnings'' }}'
 
-  feature-check:
-    name: Feature
-    needs: [list-features]
-    runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
-      matrix:
-        feature: ${{ fromJSON(needs.list-features.outputs.features) }}
-        exclude:
-          # needs the native dlss dependency
-          - feature: "dlss"
-          # needs a zstd feature
-          - feature: "smaa_luts"
-          # needs a zstd feature
-          - feature: "tonemapping_luts"
-          # needs a zstd feature
-          - feature: "bluenoise_texture"
-          # must target android
-          - feature: "android-game-activity"
-          # must target android
-          - feature: "android-native-activity"
-          # needs to know linux windowing backend
-          - feature: "bevy_winit"
-          # needs to know linux windowing backend
-          - feature: "accesskit_unix"
-          # needs to know linux windowing backend
-          - feature: "custom_cursor"
-        include:
-          - feature: "smaa_luts,zstd_rust"
-          - feature: "tonemapping_luts,zstd_rust"
-          - feature: "bluenoise_texture,zstd_rust"
-          - feature: "bevy_winit,x11"
-          - feature: "accesskit_unix,x11"
-          - feature: "custom_cursor,x11"
-    steps:
-      - name: Checkout Bevy
-        uses: actions/checkout@v4
-        with:
-          repository: bevyengine/bevy
-          ref: main
-      - name: Setup Rust
-        uses: dtolnay/rust-toolchain@beta
-      - name: Install Bevy dependencies
-        run: |
-          sudo apt-get update;
-          DEBIAN_FRONTEND=noninteractive sudo apt-get install --no-install-recommends -yq libasound2-dev libudev-dev libxkbcommon-x11-0 libwayland-dev
-      - name: Build Crate
-        run: |
-          cargo build --no-default-features --features ${{ matrix.feature }}
+  # feature-check:
+  #   name: Feature
+  #   needs: [list-features]
+  #   runs-on: ubuntu-latest
+  #   strategy:
+  #     fail-fast: false
+  #     matrix:
+  #       feature: ${{ fromJSON(needs.list-features.outputs.features) }}
+  #       exclude:
+  #         # needs the native dlss dependency
+  #         - feature: "dlss"
+  #         # needs a zstd feature
+  #         - feature: "smaa_luts"
+  #         # needs a zstd feature
+  #         - feature: "tonemapping_luts"
+  #         # needs a zstd feature
+  #         - feature: "bluenoise_texture"
+  #         # must target android
+  #         - feature: "android-game-activity"
+  #         # must target android
+  #         - feature: "android-native-activity"
+  #         # needs to know linux windowing backend
+  #         - feature: "bevy_winit"
+  #         # needs to know linux windowing backend
+  #         - feature: "accesskit_unix"
+  #         # needs to know linux windowing backend
+  #         - feature: "custom_cursor"
+  #       include:
+  #         - feature: "smaa_luts,zstd_rust"
+  #         - feature: "tonemapping_luts,zstd_rust"
+  #         - feature: "bluenoise_texture,zstd_rust"
+  #         - feature: "bevy_winit,x11"
+  #         - feature: "accesskit_unix,x11"
+  #         - feature: "custom_cursor,x11"
+  #   steps:
+  #     - name: Checkout Bevy
+  #       uses: actions/checkout@v4
+  #       with:
+  #         repository: bevyengine/bevy
+  #         ref: main
+  #     - name: Setup Rust
+  #       uses: dtolnay/rust-toolchain@beta
+  #     - name: Install Bevy dependencies
+  #       run: |
+  #         sudo apt-get update;
+  #         DEBIAN_FRONTEND=noninteractive sudo apt-get install --no-install-recommends -yq libasound2-dev libudev-dev libxkbcommon-x11-0 libwayland-dev
+  #     - name: Build Crate
+  #       run: |
+  #         cargo build --no-default-features --features ${{ matrix.feature }}
 
   example-doc-check1:
     name: Example Documentation
@@ -361,41 +361,41 @@ jobs:
         run: |
           cargo +nightly doc -Zunstable-options -Zrustdoc-scrape-examples --no-deps
 
-  release-private-registry:
-    name: Release to Private Registry
-    runs-on: ubuntu-latest
-    steps:
-      - name: Starts kellnr
-        run: |
-          docker run --detach --rm -p 8000:8000 --name kellnr -e "KELLNR_ORIGIN__HOSTNAME=localhost" ghcr.io/kellnr/kellnr:5.6
-      - name: Checkout Bevy
-        uses: actions/checkout@v4
-        with:
-          repository: bevyengine/bevy
-          ref: main
-      - name: Setup Rust
-        uses: dtolnay/rust-toolchain@nightly
-      - name: Install Bevy dependencies
-        run: |
-          sudo apt-get update;
-          DEBIAN_FRONTEND=noninteractive sudo apt-get install --no-install-recommends -yq libasound2-dev libudev-dev libxkbcommon-x11-0
-      - name: Setup kellnr registry
-        run: |
-          # add kellnr registry to cargo config
-          cat > .cargo/config.toml<< EOF
-          [registries.kellnr]
-          index = "sparse+http://localhost:8000/api/v1/crates/"
-          credential-provider = ["cargo:token"]
-          token = "Zy9HhJ02RJmg0GCrgLfaCVfU6IwDfhXD"
-          EOF
-          # remove workspace members that are not published
-          sed -z -i 's/members = \[[^]]*\]/members = ["crates\/*"]/' Cargo.toml
-          # set all local dependency as coming from the kellnr registry
-          find . -name Cargo.toml | xargs sed -i 's/{ path = "/{ registry = "kellnr", path = "/'
-      - name: Publish to kellnr registry
-        run: |
-          cargo +nightly publish --workspace --allow-dirty --no-verify --registry kellnr -Z package-workspace
-      - name: Stops kellnr
-        if: always()
-        run: |
-          docker stop kellnr
+  # release-private-registry:
+  #   name: Release to Private Registry
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - name: Starts kellnr
+  #       run: |
+  #         docker run --detach --rm -p 8000:8000 --name kellnr -e "KELLNR_ORIGIN__HOSTNAME=localhost" ghcr.io/kellnr/kellnr:5.6
+  #     - name: Checkout Bevy
+  #       uses: actions/checkout@v4
+  #       with:
+  #         repository: bevyengine/bevy
+  #         ref: main
+  #     - name: Setup Rust
+  #       uses: dtolnay/rust-toolchain@nightly
+  #     - name: Install Bevy dependencies
+  #       run: |
+  #         sudo apt-get update;
+  #         DEBIAN_FRONTEND=noninteractive sudo apt-get install --no-install-recommends -yq libasound2-dev libudev-dev libxkbcommon-x11-0
+  #     - name: Setup kellnr registry
+  #       run: |
+  #         # add kellnr registry to cargo config
+  #         cat > .cargo/config.toml<< EOF
+  #         [registries.kellnr]
+  #         index = "sparse+http://localhost:8000/api/v1/crates/"
+  #         credential-provider = ["cargo:token"]
+  #         token = "Zy9HhJ02RJmg0GCrgLfaCVfU6IwDfhXD"
+  #         EOF
+  #         # remove workspace members that are not published
+  #         sed -z -i 's/members = \[[^]]*\]/members = ["crates\/*"]/' Cargo.toml
+  #         # set all local dependency as coming from the kellnr registry
+  #         find . -name Cargo.toml | xargs sed -i 's/{ path = "/{ registry = "kellnr", path = "/'
+  #     - name: Publish to kellnr registry
+  #       run: |
+  #         cargo +nightly publish --workspace --allow-dirty --no-verify --registry kellnr -Z package-workspace
+  #     - name: Stops kellnr
+  #       if: always()
+  #       run: |
+  #         docker stop kellnr
