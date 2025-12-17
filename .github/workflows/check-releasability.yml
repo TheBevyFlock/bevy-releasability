@@ -176,7 +176,7 @@ jobs:
       - name: Install Bevy dependencies
         run: |
           sudo apt-get update;
-          DEBIAN_FRONTEND=noninteractive sudo apt-get install --no-install-recommends -yq libasound2-dev libudev-dev libxkbcommon-x11-0 libwayland-dev
+          DEBIAN_FRONTEND=noninteractive sudo apt-get install --no-install-recommends -yq libasound2-dev libudev-dev libxkbcommon-x11-0 libwayland-dev libx264-164 libx264-dev
       - uses: actions/cache/restore@v4
         id: restore-cache
         with:
@@ -229,7 +229,7 @@ jobs:
         if: runner.os == 'Linux'
         run: |
           sudo apt-get update;
-          DEBIAN_FRONTEND=noninteractive sudo apt-get install --no-install-recommends -yq libasound2-dev libudev-dev libxkbcommon-x11-0 libwayland-dev
+          DEBIAN_FRONTEND=noninteractive sudo apt-get install --no-install-recommends -yq libasound2-dev libudev-dev libxkbcommon-x11-0 libwayland-dev libx264-164 libx264-dev
       - name: Enable android game-activity
         if: matrix.target.target == 'aarch64-linux-android'
         run: |
@@ -238,12 +238,12 @@ jobs:
         run: |
           cargo build --target ${{ matrix.target.target }} -p ${{ matrix.crate }}
         env:
-          RUSTFLAGS: "${{ matrix.target.target == 'wasm32-unknown-unknown' && '--cfg getrandom_backend=\"wasm_js\" -D warnings' || '-D warnings' }}"
+          RUSTFLAGS: '${{ matrix.target.target == ''wasm32-unknown-unknown'' && ''--cfg getrandom_backend="wasm_js" -D warnings'' || ''-D warnings'' }}'
       - name: Clippy Crate
         run: |
           cargo clippy --target ${{ matrix.target.target }} -p ${{ matrix.crate }} --no-deps -- -D warnings
         env:
-          RUSTFLAGS: "${{ matrix.target.target == 'wasm32-unknown-unknown' && '--cfg getrandom_backend=\"wasm_js\" -D warnings' || '-D warnings' }}"
+          RUSTFLAGS: '${{ matrix.target.target == ''wasm32-unknown-unknown'' && ''--cfg getrandom_backend="wasm_js" -D warnings'' || ''-D warnings'' }}'
 
   feature-check:
     name: Feature
@@ -290,7 +290,7 @@ jobs:
       - name: Install Bevy dependencies
         run: |
           sudo apt-get update;
-          DEBIAN_FRONTEND=noninteractive sudo apt-get install --no-install-recommends -yq libasound2-dev libudev-dev libxkbcommon-x11-0 libwayland-dev
+          DEBIAN_FRONTEND=noninteractive sudo apt-get install --no-install-recommends -yq libasound2-dev libudev-dev libxkbcommon-x11-0 libwayland-dev libx264-164 libx264-dev
       - name: Build Crate
         run: |
           cargo build --no-default-features --features ${{ matrix.feature }}
@@ -323,7 +323,7 @@ jobs:
       - name: Install Bevy dependencies
         run: |
           sudo apt-get update;
-          DEBIAN_FRONTEND=noninteractive sudo apt-get install --no-install-recommends -yq libasound2-dev libudev-dev libxkbcommon-x11-0 libwayland-dev
+          DEBIAN_FRONTEND=noninteractive sudo apt-get install --no-install-recommends -yq libasound2-dev libudev-dev libxkbcommon-x11-0 libwayland-dev libx264-164 libx264-dev
       - name: Document with scrapping example
         run: |
           cargo +nightly doc -Zunstable-options -Zrustdoc-scrape-examples --no-deps
@@ -356,7 +356,7 @@ jobs:
       - name: Install Bevy dependencies
         run: |
           sudo apt-get update;
-          DEBIAN_FRONTEND=noninteractive sudo apt-get install --no-install-recommends -yq libasound2-dev libudev-dev libxkbcommon-x11-0 libwayland-dev
+          DEBIAN_FRONTEND=noninteractive sudo apt-get install --no-install-recommends -yq libasound2-dev libudev-dev libxkbcommon-x11-0 libwayland-dev libx264-164 libx264-dev
       - name: Document with scrapping example
         run: |
           cargo +nightly doc -Zunstable-options -Zrustdoc-scrape-examples --no-deps
