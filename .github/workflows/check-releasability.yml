@@ -307,39 +307,9 @@ jobs:
         with:
           repository: bevyengine/bevy
           ref: main
-      - name: Checkout Releasability
-        uses: actions/checkout@v4
-        with:
-          path: releasability
-      - name: Limit to one scrapped example
+      - name: Install toml-cli
         run: |
-          pip install tomli-w
-          python releasability/limit-scrapped-examples.py ${{ matrix.example }}
-          cat Cargo.toml | grep 'doc-scrape-examples = true' -B 3
-      - name: Setup Rust
-        uses: dtolnay/rust-toolchain@nightly
-      - name: Install Bevy dependencies
-        run: |
-          sudo apt-get update;
-          DEBIAN_FRONTEND=noninteractive sudo apt-get install --no-install-recommends -yq libasound2-dev libudev-dev libxkbcommon-x11-0 libwayland-dev libx264-164 libx264-dev
-      - name: Document with scrapping example
-        run: |
-          cargo +nightly doc -Zunstable-options -Zrustdoc-scrape-examples --no-deps
-
-  example-doc-check2:
-    name: Example Documentation
-    needs: [list-examples]
-    runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
-      matrix:
-        example: ${{ fromJSON(needs.list-examples.outputs.examples2) }}
-    steps:
-      - name: Checkout Bevy
-        uses: actions/checkout@v4
-        with:
-          repository: bevyengine/bevy
-          ref: main
+          cargo install toml-cli@0.2.3
       - name: Keep initial state
         id: initial
         run: |
@@ -368,12 +338,68 @@ jobs:
       - name: Fail when needed
         run: |
           if [[ ${{ steps.initial.outputs.initial }} == "false" ]]; then
-            if [[ ${{ steps.scrape.outcome }} == "success" ]]; then
+            if [[ "${{ steps.scrape.outcome }}" == "success" ]]; then
               echo "Failure expected but succeeded"
               exit 1
             fi
           else
-            if [[ ${{ steps.scrape.outcome }} == "failure" ]]; then
+            if [[ "${{ steps.scrape.outcome }}" == "failure" ]]; then
+              echo "Success expected but failed"
+              exit 1
+            fi
+          fi
+
+  example-doc-check2:
+    name: Example Documentation
+    needs: [list-examples]
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        example: ${{ fromJSON(needs.list-examples.outputs.examples2) }}
+    steps:
+      - name: Checkout Bevy
+        uses: actions/checkout@v4
+        with:
+          repository: bevyengine/bevy
+          ref: main
+      - name: Install toml-cli
+        run: |
+          cargo install toml-cli@0.2.3
+      - name: Keep initial state
+        id: initial
+        run: |
+          initial=`toml get Cargo.toml example | jq -c '.[] | select(.name=="${{ matrix.example }}") | ."doc-scrape-examples"'`
+          echo "initial=$initial" >> $GITHUB_OUTPUT
+      - name: Checkout Releasability
+        uses: actions/checkout@v4
+        with:
+          path: releasability
+      - name: Limit to one scrapped example
+        run: |
+          pip install tomli-w
+          python releasability/limit-scrapped-examples.py ${{ matrix.example }}
+          cat Cargo.toml | grep 'doc-scrape-examples = true' -B 3
+      - name: Setup Rust
+        uses: dtolnay/rust-toolchain@nightly
+      - name: Install Bevy dependencies
+        run: |
+          sudo apt-get update;
+          DEBIAN_FRONTEND=noninteractive sudo apt-get install --no-install-recommends -yq libasound2-dev libudev-dev libxkbcommon-x11-0 libwayland-dev libx264-164 libx264-dev
+      - name: Document with scrapping example
+        id: scrape
+        continue-on-error: true
+        run: |
+          cargo +nightly doc -Zunstable-options -Zrustdoc-scrape-examples --no-deps
+      - name: Fail when needed
+        run: |
+          if [[ ${{ steps.initial.outputs.initial }} == "false" ]]; then
+            if [[ "${{ steps.scrape.outcome }}" == "success" ]]; then
+              echo "Failure expected but succeeded"
+              exit 1
+            fi
+          else
+            if [[ "${{ steps.scrape.outcome }}" == "failure" ]]; then
               echo "Success expected but failed"
               exit 1
             fi
