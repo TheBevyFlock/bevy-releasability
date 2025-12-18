@@ -70,10 +70,10 @@ jobs:
       - name: Prepare example list
         id: env
         run: |
-          example_list=`toml get Cargo.toml example | jq -c '[.[] | .name][:256]'`
+          example_list=`toml get Cargo.toml example | jq -c '[.[] | .name] | sort[:256]'`
           echo "examples1=$example_list" >> $GITHUB_OUTPUT
           echo $example_list
-          example_list=`toml get Cargo.toml example | jq -c '[.[] | .name][256:]'`
+          example_list=`toml get Cargo.toml example | jq -c '[.[] | .name] | sort[256:]'`
           echo "examples2=$example_list" >> $GITHUB_OUTPUT
           echo $example_list
 
