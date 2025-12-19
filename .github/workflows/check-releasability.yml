@@ -334,7 +334,7 @@ jobs:
         id: scrape
         continue-on-error: true
         run: |
-          cargo +nightly doc -Zunstable-options -Zrustdoc-scrape-examples --no-deps
+          cargo +nightly doc -Zunstable-options -Zrustdoc-scrape-examples --no-deps --all-features
       - name: Fail when needed
         run: |
           if [[ ${{ steps.initial.outputs.initial }} == "false" ]]; then
