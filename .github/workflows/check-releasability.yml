@@ -340,7 +340,7 @@ jobs:
           if [[ ${{ steps.initial.outputs.initial }} == "false" ]]; then
             if [[ "${{ steps.scrape.outcome }}" == "success" ]]; then
               echo "Failure expected but succeeded"
-              exit 1
+              exit 2
             fi
           else
             if [[ "${{ steps.scrape.outcome }}" == "failure" ]]; then
@@ -396,7 +396,7 @@ jobs:
           if [[ ${{ steps.initial.outputs.initial }} == "false" ]]; then
             if [[ "${{ steps.scrape.outcome }}" == "success" ]]; then
               echo "Failure expected but succeeded"
-              exit 1
+              exit 2
             fi
           else
             if [[ "${{ steps.scrape.outcome }}" == "failure" ]]; then
