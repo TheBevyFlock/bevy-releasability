@@ -1,8 +1,12 @@
 name: Check Releasability
 
 on:
-  push:
   workflow_dispatch:
+    inputs:
+      check_examples:
+        description: "Run example documentation checks"
+        type: boolean
+        default: true
 
 env:
   RUSTFLAGS: "-D warnings"
@@ -54,6 +58,7 @@ jobs:
 
   list-examples:
     name: Prepare example list
+    if: inputs.check_examples
     runs-on: ubuntu-latest
     outputs:
       examples1: ${{ steps.env.outputs.examples1 }}
