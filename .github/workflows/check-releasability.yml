@@ -96,7 +96,6 @@ jobs:
       - name: check owner
         run: |
           curl --user-agent "francois@bevy.org" https://crates.io/api/v1/crates/${{ matrix.crate }}/owners | grep '${{ matrix.owner }}'
-          sleep 2
 
   crate-check:
     name: Crate Check
