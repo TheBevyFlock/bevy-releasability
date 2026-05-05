@@ -119,6 +119,13 @@ jobs:
           # needs either bevy_image/zstd_rust or bevy_image/zstd_c
           - crate: "bevy_pbr"
             extra: "--all-features"
+          # needs either bevy_image/zstd_rust or bevy_image/zstd_c
+          - crate: "bevy_solari"
+            extra: "--all-features"
+          - crate: "bevy_solari"
+            extra: ""
+          - crate: "bevy_solari"
+            extra: "--no-default-features"
           # needs either bevy_relfect/auto_register_inventory or bevy_relfect/auto_register_static
           - crate: "bevy_app"
             extra: "--all-features"
@@ -152,6 +159,12 @@ jobs:
             extra: "--all-features --features bevy_image/zstd_rust"
           - crate: "bevy_pbr"
             extra: "--all-features --features bevy_image/zstd_rust"
+          - crate: "bevy_solari"
+            extra: "--all-features --features bevy_image/zstd_rust"
+          - crate: "bevy_solari"
+            extra: "--features bevy_image/zstd_rust"
+          - crate: "bevy_solari"
+            extra: "--no-default-features --features bevy_image/zstd_rust"
           - crate: "bevy_app"
             extra: "--all-features --features bevy_reflect/auto_register_static"
           - crate: "bevy_ecs"
@@ -212,6 +225,7 @@ jobs:
         exclude:
           - crate: bevy_dylib
           - crate: bevy_remote
+          - crate: bevy_solari
     steps:
       - name: Checkout Bevy
         uses: actions/checkout@v6
@@ -259,7 +273,13 @@ jobs:
           # needs a zstd feature
           - feature: "tonemapping_luts"
           # needs a zstd feature
+          - feature: "area_light_luts"
+          # needs a zstd feature
+          - feature: "dfg_lut"
+          # needs a zstd feature
           - feature: "bluenoise_texture"
+          # needs a zstd feature
+          - feature: "bevy_solari"
           # must target android
           - feature: "android-game-activity"
           # must target android
@@ -279,7 +299,10 @@ jobs:
         include:
           - feature: "smaa_luts,zstd_rust"
           - feature: "tonemapping_luts,zstd_rust"
+          - feature: "area_light_luts,zstd_rust"
+          - feature: "dfg_lut,zstd_rust"
           - feature: "bluenoise_texture,zstd_rust"
+          - feature: "bevy_solari,zstd_rust"
           - feature: "bevy_winit,x11"
           - feature: "accesskit_unix,x11"
           - feature: "custom_cursor,x11"
