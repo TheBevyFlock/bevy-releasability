@@ -280,6 +280,8 @@ jobs:
           - feature: "bluenoise_texture"
           # needs a zstd feature
           - feature: "bevy_solari"
+          # needs a zstd feature
+          - feature: "compressed_image_saver"
           # must target android
           - feature: "android-game-activity"
           # must target android
@@ -303,6 +305,7 @@ jobs:
           - feature: "dfg_lut,zstd_rust"
           - feature: "bluenoise_texture,zstd_rust"
           - feature: "bevy_solari,zstd_rust"
+          - feature: "compressed_image_saver,zstd_rust"
           - feature: "bevy_winit,x11"
           - feature: "accesskit_unix,x11"
           - feature: "custom_cursor,x11"
